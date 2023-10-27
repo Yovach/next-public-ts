@@ -22,13 +22,18 @@
     "next": ">=14.0.0",
     "webpack": ">=5.0.0"
   },
+  "devDependencies": {
+    "tsup": "^7.2.0",
+    "typescript": "^5.2.2"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Yovach/next-public-ts.git",
     "directory": "packages/next-public-ts"
   },
-  "devDependencies": {
-    "tsup": "^7.2.0",
-    "typescript": "^5.2.2"
-  }
+  "keywords": [
+    "next",
+    "webpack",
+    "public"
+  ]
 }
