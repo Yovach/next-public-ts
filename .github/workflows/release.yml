@@ -4,10 +4,6 @@ on:
   release:
     types: [published]
 
-defaults:
-  run:
-    working-directory: packages/next-tw
-
 jobs:
   build:
     runs-on: ubuntu-latest
