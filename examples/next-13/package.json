@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "next": "13.5.6",
-    "next-public-ts": "^0.0.4",
+    "next-public-ts": "*",
     "react": "^18",
     "react-dom": "^18"
   },
