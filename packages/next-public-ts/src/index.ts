@@ -1,5 +1,4 @@
 import { transformSync } from "next/dist/build/swc/index.js";
-import { webpack } from "next/dist/compiled/webpack/webpack";
 import {
   existsSync,
   mkdirSync,
@@ -9,6 +8,7 @@ import {
   writeFileSync,
 } from "node:fs";
 import { join as pathJoin, sep as pathSep } from "node:path";
+import type { Compiler } from "webpack";
 
 function compileDirectory(inputDir: string, outputDir: string) {
   if (!existsSync(inputDir)) {
@@ -81,8 +81,8 @@ class NextPublicTsPlugin {
     this.outputDir = outputDir;
   }
 
-  apply(compiler: webpack.Compiler) {
-    compiler.hooks.afterEmit.tap("CopyPublicPlugin", (): void => {
+  apply(compiler: Compiler) {
+    compiler.hooks.afterEmit.tap("NextPublicTsPlugin", (): void => {
       for (const inputDir of this.inputDir) {
         compileDirectory(inputDir, this.outputDir);
       }
