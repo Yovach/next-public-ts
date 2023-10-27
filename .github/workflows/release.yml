@@ -4,6 +4,10 @@ on:
   release:
     types: [published]
 
+defaults:
+  run:
+    working-directory: packages/next-public-ts
+
 jobs:
   build:
     runs-on: ubuntu-latest

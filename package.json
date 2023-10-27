@@ -1,32 +1,7 @@
 {
-  "name": "next-public-ts",
-  "version": "0.0.4",
-  "description": "A webpack plugin to compile TypeScript files in the public folder of a Next.js project.",
-  "main": "dist/index.js",
-  "types": "src/index.ts",
-  "scripts": {
-    "build": "tsup"
-  },
-  "exports": {
-    ".": {
-      "import": "./dist/index.js",
-      "require": "./dist/index.mjs"
-    }
-  },
-  "license": "MIT",
-  "dependencies": {
-    "next": ">=14.0.0",
-    "webpack": ">=5.0.0"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/Yovach/next-public-ts.git"
-  },
-  "files": [
-    "dist"
-  ],
-  "devDependencies": {
-    "tsup": "^7.2.0",
-    "typescript": "^5.2.2"
-  }
+  "private": true,
+  "workspaces": [
+    "./private/*",
+    "./packages/*"
+  ]
 }
