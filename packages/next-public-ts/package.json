@@ -34,6 +34,6 @@
     "public"
   ],
   "peerDependencies": {
-    "next": "^13.5.0 || ^14.0.0"
+    "next": "^13.1.0 || ^14.0.0"
   }
 }
