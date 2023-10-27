@@ -60,7 +60,7 @@ type PluginOptions = {
   enabled?: boolean;
 };
 
-class CopyPublicPlugin {
+class NextPublicTsPlugin {
   inputDir: string[];
   outputDir: string;
   enabled: boolean;
@@ -90,4 +90,4 @@ class CopyPublicPlugin {
   }
 }
 
-export { CopyPublicPlugin };
+export { NextPublicTsPlugin };
