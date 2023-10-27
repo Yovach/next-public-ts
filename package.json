@@ -1,6 +1,6 @@
 {
   "name": "next-public-ts",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "A webpack plugin to compile TypeScript files in the public folder of a Next.js project.",
   "main": "dist/index.js",
   "types": "src/index.ts",
