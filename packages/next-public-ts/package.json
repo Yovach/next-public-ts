@@ -18,13 +18,10 @@
       "require": "./dist/index.js"
     }
   },
-  "dependencies": {
-    "next": ">=14.0.0",
-    "webpack": ">=5.0.0"
-  },
   "devDependencies": {
     "tsup": "^7.2.0",
-    "typescript": "^5.2.2"
+    "typescript": "^5.2.2",
+    "webpack": "^5.89.0"
   },
   "repository": {
     "type": "git",
@@ -35,5 +32,8 @@
     "next",
     "webpack",
     "public"
-  ]
+  ],
+  "peerDependencies": {
+    "next": "^14.0.0"
+  }
 }
