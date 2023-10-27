@@ -5,7 +5,7 @@ const path = require("node:path");
 const nextConfig = {
   webpack(config, context) {
     config.plugins.push(new NextPublicTsPlugin({
-      inputDir: path.join(__dirname, "src", "app", "+public"),
+      inputDir: path.join(__dirname, "app", "+public"),
       outputDir: path.join(__dirname, "public"),
     }));
     return config;
