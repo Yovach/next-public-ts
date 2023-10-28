@@ -50,7 +50,7 @@ export function getSwcOptions(): SwcOptions {
       loose: true,
     },
     sourceMaps: false,
-    isModule: true,
+    isModule: "unknown",
     minify: true,
   };
 }
