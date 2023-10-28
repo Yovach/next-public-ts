@@ -4,11 +4,14 @@ A webpack plugin to compile TypeScript files in the public folder of a Next.js p
 
 I created this Webpack plugin because I wanted to use TypeScript in the public folder of my Next.js project but Next.js doesn't support this out of the box.
 
-## Use cases
+## Features
 
-- Service workers
-- Web workers
-- Other JavaScript files that need to be in the public folder (if you want to write them in TypeScript and minify them)
+- Write your `Service Workers` and your `Web Workers` in TypeScript
+- Handle `process.env.NEXT_PUBLIC_*` in your TypeScript files
+- Compile and minify your TypeScript files
+- Auto-detect `*.ts` with `autoDetect` option and `+public` directory
+- Inject a **SHA-1** hash of the file content into `%checksum%` variable in the compiled file
+- Support for CommonJS and ES modules
 
 ## Installation
 
