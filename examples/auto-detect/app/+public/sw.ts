@@ -3,7 +3,7 @@ export type {};
 declare let self: ServiceWorkerGlobalScope;
 
 self.addEventListener("install", async () => {
-  console.log("Service worker installed (%checksum%)");
+  console.log("Service worker installed (%checksum%) on version " + process.env.NEXT_PUBLIC_VERSION);
 });
 
 self.addEventListener("fetch", (evt: FetchEvent) => {
