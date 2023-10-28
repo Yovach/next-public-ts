@@ -65,7 +65,21 @@ const nextConfig = {
 };
 ```
 
-## Options
+### Auto-detect `+public` directory
+
+```js
+// next.config.js
+const { NextPublicTsPlugin } = require("next-public-ts");
+
+const nextConfig = {
+  webpack(config, context) {
+    config.plugins.push(new NextPublicTsPlugin({
+      autoDetect: true,
+    }));
+    return config;
+  },
+};
+```
 
 ### `inputDir`
 A string representing the path to the directory containing the TypeScript files to be compiled.
