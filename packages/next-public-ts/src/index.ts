@@ -62,15 +62,13 @@ class NextPublicTsPlugin {
           },
           async () => {
             try {
-              if (this.#autoDetect) {
-                await compileFiles(this.#input);
-              } else {
-                await Promise.all(
-                  this.#input.map(async (inputDir) => {
-                    return compileDirectory(inputDir, this.#output);
-                  })
-                );
-              }
+              await Promise.all(
+                this.#autoDetect
+                  ? compileFiles(this.#input)
+                  : this.#input.map(async (inputDir) =>
+                      compileDirectory(inputDir, this.#output)
+                    )
+              );
             } catch (e) {
               console.error(e);
             }

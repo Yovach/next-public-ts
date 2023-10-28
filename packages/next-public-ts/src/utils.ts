@@ -54,12 +54,12 @@ export function getSwcOptions(): SwcOptions {
 /**
  * Compiles files in a directory
  */
-export async function compileDirectory(
+export function compileDirectory(
   inputDir: string,
   outputDir: string
-): Promise<void> {
+): Promise<void>[] {
   const files = globSync([inputDir + "/**/*.ts", "!**/public"]);
-  for (const file of files) {
+  return files.map(async (file) => {
     const [, filePath] = file.split("+public/", 2);
     if (!filePath) {
       throw new Error("Invalid file path");
@@ -78,15 +78,15 @@ export async function compileDirectory(
     const fileContent = await compileFile(inputFilePath);
 
     // write compiled file to output directory
-    await promises.writeFile(outputFilePath, fileContent);
-  }
+    return promises.writeFile(outputFilePath, fileContent);
+  });
 }
 
 /**
  * Compiles a list of files
  */
-export async function compileFiles(inputFiles: string[]): Promise<void> {
-  for (const file of inputFiles) {
+export function compileFiles(inputFiles: string[]): Promise<void>[] {
+  return inputFiles.map(async (file) => {
     const [, filePath] = file.split("+public/", 2);
     if (!filePath) {
       throw new Error("Invalid file path");
@@ -104,6 +104,6 @@ export async function compileFiles(inputFiles: string[]): Promise<void> {
     const fileContent = await compileFile(filePath);
 
     // write compiled file to output directory
-    await promises.writeFile(outputFilePath, fileContent);
-  }
+    return promises.writeFile(outputFilePath, fileContent);
+  });
 }
