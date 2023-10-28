@@ -1,4 +1,4 @@
-import { globSync } from "fast-glob";
+import fastGlob from "fast-glob";
 import type { Compiler } from "webpack";
 import { compileDirectory, compileFiles } from "./utils";
 
@@ -41,7 +41,7 @@ class NextPublicTsPlugin {
       this.#output = "public";
       this.#autoDetect = true;
 
-      this.#input = globSync(["**/+public/**/*.ts", "!**/public"]);
+      this.#input = fastGlob.sync(["**/+public/**/*.ts", "!**/public"]);
     }
   }
 
@@ -63,13 +63,13 @@ class NextPublicTsPlugin {
               this.#autoDetect
                 ? compileFiles(this.#input)
                 : this.#input.map(async (inputDir) =>
-                    compileDirectory(inputDir, this.#output)
-                  )
+                    compileDirectory(inputDir, this.#output),
+                  ),
             );
           } catch (e) {
             console.error(e);
           }
-        }
+        },
       );
     });
   }
