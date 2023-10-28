@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "test": "npm run build && node --test ./tests/"
   },
   "dependencies": {
     "next": "13.5.6",

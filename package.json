@@ -1,5 +1,8 @@
 {
   "private": true,
+  "scripts": {
+    "test": "npm run test --ws --if-present"
+  },
   "workspaces": [
     "./examples/*",
     "./packages/*"
