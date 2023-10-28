@@ -1,4 +1,4 @@
 node_modules/
 dist/
 
-**/**/public/sw.js
+**/**/public/**/*.js
