@@ -31,6 +31,10 @@ export async function compileFile(filePath: string): Promise<string> {
   return transformed.code;
 }
 
+/**
+ * Get SWC options for compiling TypeScript files
+ * @link https://swc.rs/docs/configuration/swcrc#compilation
+ */
 export function getSwcOptions(): SwcOptions {
   return {
     jsc: {
