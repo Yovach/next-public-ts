@@ -3,7 +3,7 @@ export type {};
 declare let self: ServiceWorkerGlobalScope;
 
 self.addEventListener("install", async () => {
-  console.log("Service worker installed");
+  console.log("Service worker installed (%checksum%)");
 });
 
 self.addEventListener("fetch", (evt: FetchEvent) => {
@@ -11,5 +11,5 @@ self.addEventListener("fetch", (evt: FetchEvent) => {
 });
 
 self.addEventListener("error", (err) => {
-  console.error("Service worker error", err);
+  console.error("Service worker error (%checksum%)", err);
 });

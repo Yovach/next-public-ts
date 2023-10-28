@@ -1,10 +1,49 @@
 import { globSync } from "fast-glob";
 import { transformSync } from "next/dist/build/swc/index.js";
+import { subtle } from "node:crypto";
 import { existsSync, promises } from "node:fs";
 import { dirname, join as pathJoin, sep as pathSep } from "node:path";
 import { type Compiler } from "webpack";
 
+const encoder = new TextEncoder();
+
+function getSwcOptions() {
+  return {
+    jsc: {
+      parser: {
+        syntax: "typescript",
+      },
+      minify: {
+        mangle: {},
+        compress: {},
+        format: {},
+      },
+      target: "es2020",
+      loose: true,
+    },
+    sourceMaps: false,
+    isModule: true,
+    minify: true,
+  };
+}
+
 /**
+ * Calculates the SHA-1 checksum of a given string
+ */
+async function calculateChecksum(fileContent: string) {
+  const checksum = await subtle.digest("SHA-1", encoder.encode(fileContent));
+  const checksumStr = Array.from(new Uint8Array(checksum))
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("");
+  return checksumStr;
+}
+
+async function injectChecksum(code: string) {
+  return code.replace(/%checksum%/g, await calculateChecksum(code));
+}
+
+/**
+ * Compiles files in a directory
  * @deprecated
  */
 async function compileDirectory(inputDir: string, outputDir: string) {
@@ -31,23 +70,10 @@ async function compileDirectory(inputDir: string, outputDir: string) {
       const fileContent = await promises.readFile(filePath, "utf-8");
 
       // compile file with swc (from next.js)
-      const transformed = transformSync(fileContent, {
-        jsc: {
-          parser: {
-            syntax: "typescript",
-          },
-          minify: {
-            mangle: {},
-            compress: {},
-            format: {},
-          },
-          target: "es2020",
-          loose: true,
-        },
-        sourceMaps: false,
-        isModule: true,
-        minify: true,
-      });
+      const transformed = transformSync(fileContent, getSwcOptions()) as {
+        code: string;
+      };
+      transformed.code = await injectChecksum(transformed.code);
 
       // write compiled file to output directory
       const outputFilePath = pathJoin(outputDir, file.replace(".ts", ".js"));
@@ -56,6 +82,9 @@ async function compileDirectory(inputDir: string, outputDir: string) {
   }
 }
 
+/**
+ * Compiles a list of files
+ */
 async function compileFiles(inputFiles: string[]) {
   for (const file of inputFiles) {
     const [, filePath] = file.split("+public/", 2);
@@ -65,33 +94,19 @@ async function compileFiles(inputFiles: string[]) {
 
     const fileContent = await promises.readFile(file, "utf-8");
 
-    // compile file with swc (from next.js)
-    const transformed = transformSync(fileContent, {
-      jsc: {
-        parser: {
-          syntax: "typescript",
-        },
-        minify: {
-          mangle: {},
-          compress: {},
-          format: {},
-        },
-        target: "es2020",
-        loose: true,
-      },
-      sourceMaps: false,
-      isModule: true,
-      minify: true,
-    });
-
     const outputFilePath = pathJoin("public", filePath.replace(".ts", ".js"));
-
     // create output directory if it doesn't exist
     if (!existsSync(outputFilePath)) {
       await promises.mkdir(dirname(outputFilePath), {
         recursive: true,
       });
     }
+
+    // compile file with swc (from next.js)
+    const transformed = transformSync(fileContent, getSwcOptions()) as {
+      code: string;
+    };
+    transformed.code = await injectChecksum(transformed.code);
 
     // write compiled file to output directory
     await promises.writeFile(outputFilePath, transformed.code);
