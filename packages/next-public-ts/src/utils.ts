@@ -105,7 +105,7 @@ export function compileFiles(inputFiles: string[]): Promise<void>[] {
     }
 
     // compile file with swc (from next.js)
-    const fileContent = await compileFile(filePath);
+    const fileContent = await compileFile(file);
 
     // write compiled file to output directory
     return promises.writeFile(outputFilePath, fileContent);
