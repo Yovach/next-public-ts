@@ -5,6 +5,7 @@ import { type Compiler } from "webpack";
 
 async function compileDirectory(inputDir: string, outputDir: string) {
   if (!existsSync(inputDir)) {
+    console.warn(`Input directory ${inputDir} does not exist`);
     return;
   } else if (!existsSync(outputDir)) {
     // create output directory if it doesn't exist
