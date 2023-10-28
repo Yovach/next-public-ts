@@ -81,6 +81,16 @@ const nextConfig = {
 };
 ```
 
+## Plugins options
+
+### `enabled`
+A boolean value indicating whether the plugin should be enabled. Defaults to `true`.\
+**NOTE**: Use this option to disable the plugin in development mode.
+
+### `autoDetect`
+A boolean value indicating whether the plugin should automatically detect the TypeScript files in the input directory. Defaults to `false`.\
+e.g.: If you want to let the plugin to detect TypeScript files in `app/+public` directory.
+
 ### `inputDir`
 A string representing the path to the directory containing the TypeScript files to be compiled.
 
