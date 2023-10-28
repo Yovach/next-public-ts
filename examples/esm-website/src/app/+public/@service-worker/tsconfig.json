@@ -1,0 +1,14 @@
+{
+  "extends": "../../../../tsconfig.json",
+  "compilerOptions": {
+    "target": "es2020",
+    "lib": [
+      "WebWorker",
+      "esnext"
+    ]
+  },
+  "include": [
+    "**/**/sw.ts"
+  ],
+  "exclude": []
+}

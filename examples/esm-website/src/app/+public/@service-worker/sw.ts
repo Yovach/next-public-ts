@@ -1,6 +1,5 @@
-/// <reference lib="WebWorker" />
 export type {};
-declare let self: ServiceWorkerGlobalScope;
+declare const self: ServiceWorkerGlobalScope;
 
 self.addEventListener("install", async () => {
   console.log("Service worker installed (%checksum%) on version " + process.env.NEXT_PUBLIC_VERSION);
