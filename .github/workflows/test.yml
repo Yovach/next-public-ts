@@ -1,6 +1,6 @@
 name: Test library
 
-on: [push, pull_request]
+on: [release, pull_request]
 
 # Cancel previous runs if they were started before the current run.
 # This prevents the workflow from running on multiple commits simultaneously.
