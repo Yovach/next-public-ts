@@ -1,0 +1,24 @@
+name: Test library
+
+on: [release, pull_request]
+
+# Cancel previous runs if they were started before the current run.
+# This prevents the workflow from running on multiple commits simultaneously.
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v3
+        with:
+          node-version: "20.x"
+          registry-url: "https://registry.npmjs.org"
+      # Install dependencies and test
+      - run: npm ci
+      # Build the library because examples depend on it
+      - run: npm run build --workspace=next-public-ts
+      - run: npm run test
