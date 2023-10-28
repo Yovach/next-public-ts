@@ -172,14 +172,18 @@ class NextPublicTsPlugin {
             stage: Compilation.PROCESS_ASSETS_STAGE_ADDITIONAL,
           },
           async () => {
-            if (this.#autoDetect) {
-              return compileFiles(this.#input);
-            } else {
-              await Promise.all(
-                this.#input.map(async (inputDir) => {
-                  return compileDirectory(inputDir, this.#output);
-                })
-              );
+            try {
+              if (this.#autoDetect) {
+                await compileFiles(this.#input);
+              } else {
+                await Promise.all(
+                  this.#input.map(async (inputDir) => {
+                    return compileDirectory(inputDir, this.#output);
+                  })
+                );
+              }
+            } catch (e) {
+              console.error(e);
             }
           }
         );
