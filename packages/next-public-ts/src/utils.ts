@@ -7,6 +7,8 @@ import { dirname, join as pathJoin } from "node:path";
 
 const encoder = new TextEncoder();
 
+const publicEnv = /process\.env\.NEXT_PUBLIC_([a-zA-Z\_]+)/g;
+
 /**
  * Calculates the SHA-1 checksum of a given string
  */
@@ -18,15 +20,32 @@ export async function calculateChecksum(fileContent: string): Promise<string> {
   return checksumStr;
 }
 
+function getEnvVar(name: string): string {
+  const value = process.env[`NEXT_PUBLIC_${name}`];
+  if (!value) {
+    console.warn(
+      `[next-public-ts] Environment variable NEXT_PUBLIC_${name} is not defined`
+    );
+    return '""';
+  }
+  return `"${value}"`;
+}
+
 /**
  * Compiles a file with swc and replace %checksum% with the SHA-1 checksum of the file
  */
 export async function compileFile(filePath: string): Promise<string> {
-  const fileContent = await promises.readFile(filePath, "utf-8");
+  let fileContent = await promises.readFile(filePath, "utf-8");
+
+  // replace process.env.NEXT_PUBLIC_* with the actual value
+  // or an empty string if it's not defined
+  fileContent = fileContent.replace(publicEnv, (_, envVar) =>
+    getEnvVar(envVar)
+  );
   const transformed = await transform(fileContent, getSwcOptions());
   transformed.code = transformed.code.replace(
     /%checksum%/g,
-    await calculateChecksum(transformed.code),
+    await calculateChecksum(transformed.code)
   );
   return transformed.code;
 }
@@ -60,7 +79,7 @@ export function getSwcOptions(): SwcOptions {
  */
 export function compileDirectory(
   inputDir: string,
-  outputDir: string,
+  outputDir: string
 ): Promise<void>[] {
   const files = fastGlob.sync([inputDir + "/**/*.ts", "!**/public"]);
   return files.map(async (file) => {
