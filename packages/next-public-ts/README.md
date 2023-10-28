@@ -24,8 +24,6 @@ npm install --save-dev next-public-ts
 import path from "node:path";
 import { NextPublicTsPlugin } from "next-public-ts";
 
-const __dirname = new URL(".", import.meta.url).pathname;
-
 /**
  * @type {import('next').NextConfig}
  */
@@ -33,8 +31,8 @@ const nextConfig = {
   webpack(config, context) {
     config.plugins.push(
       new NextPublicTsPlugin({
-        inputDir: path.join(__dirname, "src", "app", "+public"),
-        outputDir: path.join(__dirname, "public"),
+        inputDir: path.join("src", "app", "+public"),
+        outputDir: path.join("public"),
       })
     );
     return config;
@@ -55,8 +53,8 @@ const nextConfig = {
   webpack(config, context) {
     config.plugins.push(
       new NextPublicTsPlugin({
-        inputDir: path.join(__dirname, "src", "app", "+public"),
-        outputDir: path.join(__dirname, "public"),
+        inputDir: path.join("src", "app", "+public"),
+        outputDir: path.join("public"),
       })
     );
     return config;

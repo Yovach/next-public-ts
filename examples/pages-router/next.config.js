@@ -9,8 +9,8 @@ const nextConfig = {
   },
   webpack(config, context) {
     config.plugins.push(new NextPublicTsPlugin({
-      inputDir: path.join(__dirname, "src", "+public"),
-      outputDir: path.join(__dirname, "public"),
+      inputDir: path.join("src", "+public"),
+      outputDir: path.join("public"),
     }));
     return config;
   }

@@ -8,8 +8,8 @@ const nextConfig = {
   },
   webpack(config, context) {
     config.plugins.push(new NextPublicTsPlugin({
-      inputDir: path.join(__dirname, "app", "+public"),
-      outputDir: path.join(__dirname, "public"),
+      inputDir: path.join("app", "+public"),
+      outputDir: path.join("public"),
     }));
     return config;
   }
