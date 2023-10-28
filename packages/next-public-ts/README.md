@@ -2,7 +2,6 @@
 
 A webpack plugin to compile TypeScript files in the public folder of a Next.js project.
 
-
 I created this Webpack plugin because I wanted to use TypeScript in the public folder of my Next.js project but Next.js doesn't support this out of the box.
 
 ## Use cases
@@ -97,6 +96,6 @@ A string representing the path to the directory containing the TypeScript files 
 ### `outputDir`
 A string representing the path to the directory where the compiled JavaScript files will be written.
 
-### `enabled`
-A boolean value indicating whether the plugin should be enabled. Defaults to `true`.\
-**NOTE**: Use this option to disable the plugin in development mode.
+
+## Examples
+You can find examples in the [examples](https://github.com/Yovach/next-public-ts/tree/main/examples) directory.
