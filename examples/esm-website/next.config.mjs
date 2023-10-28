@@ -10,6 +10,9 @@ const nextConfig = {
     config.plugins.push(new NextPublicTsPlugin({
       inputDir: path.join("src", "app", "+public"),
       outputDir: path.join("public"),
+
+      // Only enable in production during build
+      enabled: !context.isServer && !context.dev,
     }));
     return config;
   }
