@@ -13,6 +13,9 @@ import type { Compiler } from "webpack";
 function compileDirectory(inputDir: string, outputDir: string) {
   if (!existsSync(inputDir)) {
     return;
+  } else if (!existsSync(outputDir)) {
+    // create output directory if it doesn't exist
+    await promises.mkdir(outputDir, { recursive: true });
   }
 
   const files = readdirSync(inputDir);
@@ -26,9 +29,6 @@ function compileDirectory(inputDir: string, outputDir: string) {
       if (!filePath.endsWith(".ts")) {
         // ignore non-ts files
         continue;
-      } else if (!existsSync(outputDir)) {
-        // create output directory if it doesn't exist
-        mkdirSync(outputDir, { recursive: true });
       }
       const fileContent = readFileSync(filePath, "utf-8");
       const transformed = transformSync(fileContent, {
