@@ -1,6 +1,6 @@
 import type { Options as SwcOptions } from "@swc/core";
 import { transform } from "@swc/core";
-import { globSync } from "fast-glob";
+import fastGlob from "fast-glob";
 import { subtle } from "node:crypto";
 import { existsSync, promises } from "node:fs";
 import { dirname, join as pathJoin } from "node:path";
@@ -26,7 +26,7 @@ export async function compileFile(filePath: string): Promise<string> {
   const transformed = await transform(fileContent, getSwcOptions());
   transformed.code = transformed.code.replace(
     /%checksum%/g,
-    await calculateChecksum(transformed.code)
+    await calculateChecksum(transformed.code),
   );
   return transformed.code;
 }
@@ -60,9 +60,9 @@ export function getSwcOptions(): SwcOptions {
  */
 export function compileDirectory(
   inputDir: string,
-  outputDir: string
+  outputDir: string,
 ): Promise<void>[] {
-  const files = globSync([inputDir + "/**/*.ts", "!**/public"]);
+  const files = fastGlob.sync([inputDir + "/**/*.ts", "!**/public"]);
   return files.map(async (file) => {
     const [, filePath] = file.split(inputDir, 2);
     if (!filePath) {
