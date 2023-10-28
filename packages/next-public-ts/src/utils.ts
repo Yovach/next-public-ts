@@ -60,7 +60,7 @@ export function compileDirectory(
 ): Promise<void>[] {
   const files = globSync([inputDir + "/**/*.ts", "!**/public"]);
   return files.map(async (file) => {
-    const [, filePath] = file.split("+public/", 2);
+    const [, filePath] = file.split(inputDir, 2);
     if (!filePath) {
       throw new Error("Invalid file path");
     }
