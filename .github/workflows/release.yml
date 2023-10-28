@@ -1,6 +1,11 @@
 name: Publish Package to npmjs
 
 on:
+  workflow_run: 
+    workflows: ["Test library"]
+    branches: [main]
+    types:
+      - completed
   release:
     types: [published]
 
