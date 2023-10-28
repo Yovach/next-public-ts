@@ -1,6 +1,6 @@
 const test = require("node:test");
 const { readFile } = require("node:fs/promises");
-const { doesNotReject, rejects } = require("node:assert");
+const { doesNotReject, rejects, equal } = require("node:assert");
 
 test("next-13 website", async (t) => {
   await t.test("check file sw.js", async () => {
