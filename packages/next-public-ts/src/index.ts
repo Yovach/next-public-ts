@@ -80,6 +80,10 @@ class NextPublicTsPlugin {
   }
 
   apply(compiler: Compiler) {
+    if (!this.enabled) {
+      return;
+    }
+
     const { webpack } = compiler;
     const { Compilation } = webpack;
     compiler.hooks.compilation.tap(
