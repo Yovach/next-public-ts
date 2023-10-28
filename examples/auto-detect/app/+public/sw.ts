@@ -13,3 +13,7 @@ self.addEventListener("fetch", (evt: FetchEvent) => {
 self.addEventListener("error", (err) => {
   console.error("Service worker error (%checksum%)", err);
 });
+
+self.addEventListener("activate", () => {
+  console.log("Service worker activated (%checksum%)");
+});

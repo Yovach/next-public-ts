@@ -1,13 +1,14 @@
+import type { Options as SwcOptions } from "@swc/core";
+import { transform } from "@swc/core";
 import { globSync } from "fast-glob";
-import { transformSync } from "next/dist/build/swc/index.js";
 import { subtle } from "node:crypto";
 import { existsSync, promises } from "node:fs";
 import { dirname, join as pathJoin, sep as pathSep } from "node:path";
-import { type Compiler } from "webpack";
+import type { Compiler } from "webpack";
 
 const encoder = new TextEncoder();
 
-function getSwcOptions() {
+function getSwcOptions(): SwcOptions {
   return {
     jsc: {
       parser: {
@@ -30,7 +31,7 @@ function getSwcOptions() {
 /**
  * Calculates the SHA-1 checksum of a given string
  */
-async function calculateChecksum(fileContent: string) {
+async function calculateChecksum(fileContent: string): Promise<string> {
   const checksum = await subtle.digest("SHA-1", encoder.encode(fileContent));
   const checksumStr = Array.from(new Uint8Array(checksum))
     .map((b) => b.toString(16).padStart(2, "0"))
@@ -38,7 +39,7 @@ async function calculateChecksum(fileContent: string) {
   return checksumStr;
 }
 
-async function injectChecksum(code: string) {
+async function injectChecksum(code: string): Promise<string> {
   return code.replace(/%checksum%/g, await calculateChecksum(code));
 }
 
@@ -46,7 +47,10 @@ async function injectChecksum(code: string) {
  * Compiles files in a directory
  * @deprecated
  */
-async function compileDirectory(inputDir: string, outputDir: string) {
+async function compileDirectory(
+  inputDir: string,
+  outputDir: string
+): Promise<void> {
   if (!existsSync(inputDir)) {
     console.warn(`Input directory ${inputDir} does not exist`);
     return;
@@ -70,9 +74,7 @@ async function compileDirectory(inputDir: string, outputDir: string) {
       const fileContent = await promises.readFile(filePath, "utf-8");
 
       // compile file with swc (from next.js)
-      const transformed = transformSync(fileContent, getSwcOptions()) as {
-        code: string;
-      };
+      const transformed = await transform(fileContent, getSwcOptions());
       transformed.code = await injectChecksum(transformed.code);
 
       // write compiled file to output directory
@@ -85,7 +87,7 @@ async function compileDirectory(inputDir: string, outputDir: string) {
 /**
  * Compiles a list of files
  */
-async function compileFiles(inputFiles: string[]) {
+async function compileFiles(inputFiles: string[]): Promise<void> {
   for (const file of inputFiles) {
     const [, filePath] = file.split("+public/", 2);
     if (!filePath) {
@@ -103,9 +105,7 @@ async function compileFiles(inputFiles: string[]) {
     }
 
     // compile file with swc (from next.js)
-    const transformed = transformSync(fileContent, getSwcOptions()) as {
-      code: string;
-    };
+    const transformed = await transform(fileContent, getSwcOptions());
     transformed.code = await injectChecksum(transformed.code);
 
     // write compiled file to output directory
@@ -152,12 +152,8 @@ class NextPublicTsPlugin {
       this.#output = "public";
       this.#autoDetect = true;
 
-      this.#input = this.getFiles();
+      this.#input = globSync(["**/+public/**/*.ts", "!**/public"]);
     }
-  }
-
-  getFiles() {
-    return globSync(["**/+public/**/*.ts", "!**/public"]);
   }
 
   apply(compiler: Compiler) {
