@@ -51,31 +51,27 @@ class NextPublicTsPlugin {
     }
 
     const { webpack } = compiler;
-    const { Compilation } = webpack;
-    compiler.hooks.compilation.tap(
-      "NextPublicTsPlugin",
-      (compilation): void => {
-        compilation.hooks.processAssets.tapPromise(
-          {
-            name: "NextPublicTsPlugin",
-            stage: Compilation.PROCESS_ASSETS_STAGE_ADDITIONAL,
-          },
-          async () => {
-            try {
-              await Promise.all(
-                this.#autoDetect
-                  ? compileFiles(this.#input)
-                  : this.#input.map(async (inputDir) =>
-                      compileDirectory(inputDir, this.#output)
-                    )
-              );
-            } catch (e) {
-              console.error(e);
-            }
+    compiler.hooks.compilation.tap("NextPublicTsPlugin", (compilation) => {
+      compilation.hooks.processAssets.tapPromise(
+        {
+          name: "NextPublicTsPlugin",
+          stage: webpack.Compilation.PROCESS_ASSETS_STAGE_ADDITIONAL,
+        },
+        async () => {
+          try {
+            await Promise.all(
+              this.#autoDetect
+                ? compileFiles(this.#input)
+                : this.#input.map(async (inputDir) =>
+                    compileDirectory(inputDir, this.#output)
+                  )
+            );
+          } catch (e) {
+            console.error(e);
           }
-        );
-      }
-    );
+        }
+      );
+    });
   }
 }
 
