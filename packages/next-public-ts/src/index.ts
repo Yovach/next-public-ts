@@ -1,8 +1,12 @@
+import { globSync } from "fast-glob";
 import { transformSync } from "next/dist/build/swc/index.js";
 import { existsSync, promises } from "node:fs";
-import { join as pathJoin, sep as pathSep } from "node:path";
+import { dirname, join as pathJoin, sep as pathSep } from "node:path";
 import { type Compiler } from "webpack";
 
+/**
+ * @deprecated
+ */
 async function compileDirectory(inputDir: string, outputDir: string) {
   if (!existsSync(inputDir)) {
     console.warn(`Input directory ${inputDir} does not exist`);
@@ -52,35 +56,97 @@ async function compileDirectory(inputDir: string, outputDir: string) {
   }
 }
 
+async function compileFiles(inputFiles: string[]) {
+  for (const file of inputFiles) {
+    const [, filePath] = file.split("+public/", 2);
+    if (!filePath) {
+      throw new Error("Invalid file path");
+    }
+
+    const fileContent = await promises.readFile(file, "utf-8");
+
+    // compile file with swc (from next.js)
+    const transformed = transformSync(fileContent, {
+      jsc: {
+        parser: {
+          syntax: "typescript",
+        },
+        minify: {
+          mangle: {},
+          compress: {},
+          format: {},
+        },
+        target: "es2020",
+        loose: true,
+      },
+      sourceMaps: false,
+      isModule: true,
+      minify: true,
+    });
+
+    const outputFilePath = pathJoin("public", filePath.replace(".ts", ".js"));
+
+    // create output directory if it doesn't exist
+    if (!existsSync(outputFilePath)) {
+      await promises.mkdir(dirname(outputFilePath), {
+        recursive: true,
+      });
+    }
+
+    // write compiled file to output directory
+    await promises.writeFile(outputFilePath, transformed.code);
+  }
+}
+
 type PluginOptions = {
-  inputDir: string | string[];
-  outputDir: string;
   enabled?: boolean;
-};
+} & (
+  | {
+      inputDir: string | string[];
+      outputDir: string;
+      autoDetect?: false;
+    }
+  | {
+      autoDetect: true;
+    }
+);
 
 class NextPublicTsPlugin {
-  inputDir: string[];
-  outputDir: string;
-  enabled: boolean;
+  #input: string[];
+  #output: string;
+
+  #enabled: boolean;
+  #autoDetect: boolean = false;
   constructor(options: PluginOptions) {
     if (!options) {
       throw new Error("`options` is required");
     }
 
-    let { inputDir, outputDir } = options;
-    if (!outputDir || !inputDir) {
-      throw new Error("`inputDir` and `outputDir` are both required");
-    } else if (typeof inputDir === "string") {
-      inputDir = [inputDir];
-    }
+    this.#enabled = options.enabled ?? true;
+    if (!options.autoDetect) {
+      let { inputDir, outputDir } = options;
+      if (!outputDir || !inputDir) {
+        throw new Error("`inputDir` and `outputDir` are both required");
+      } else if (typeof inputDir === "string") {
+        inputDir = [inputDir];
+      }
 
-    this.enabled = options.enabled ?? true;
-    this.inputDir = inputDir;
-    this.outputDir = outputDir;
+      this.#input = inputDir;
+      this.#output = outputDir;
+    } else {
+      this.#output = "public";
+      this.#autoDetect = true;
+
+      this.#input = this.getFiles();
+    }
+  }
+
+  getFiles() {
+    return globSync(["**/+public/**/*.ts", "!**/public"]);
   }
 
   apply(compiler: Compiler) {
-    if (!this.enabled) {
+    if (!this.#enabled) {
       return;
     }
 
@@ -95,11 +161,15 @@ class NextPublicTsPlugin {
             stage: Compilation.PROCESS_ASSETS_STAGE_ADDITIONAL,
           },
           async () => {
-            await Promise.all(
-              this.inputDir.map(async (inputDir) => {
-                return compileDirectory(inputDir, this.outputDir);
-              })
-            );
+            if (this.#autoDetect) {
+              return compileFiles(this.#input);
+            } else {
+              await Promise.all(
+                this.#input.map(async (inputDir) => {
+                  return compileDirectory(inputDir, this.#output);
+                })
+              );
+            }
           }
         );
       }

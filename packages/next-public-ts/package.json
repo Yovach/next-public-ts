@@ -35,5 +35,8 @@
   ],
   "peerDependencies": {
     "next": "^13.1.0 || ^14.0.0"
+  },
+  "dependencies": {
+    "fast-glob": "^3.3.1"
   }
 }
