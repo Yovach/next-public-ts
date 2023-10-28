@@ -19,4 +19,6 @@ jobs:
           registry-url: "https://registry.npmjs.org"
       # Install dependencies and test
       - run: npm ci
+      # Build the library because examples depend on it
+      - run: npm run build --workspace=next-public-ts
       - run: npm run test
