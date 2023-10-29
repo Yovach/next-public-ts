@@ -14,7 +14,8 @@ defaults:
     working-directory: packages/next-public-ts
 
 jobs:
-  build:
+  build-publish:
+    name: Build and publish
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
