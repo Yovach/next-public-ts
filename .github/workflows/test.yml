@@ -9,7 +9,8 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  build:
+  test:
+    name: Test library on examples
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
