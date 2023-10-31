@@ -1,7 +1,6 @@
 import type { Options as SwcOptions } from "@swc/core";
-import { transform } from "@swc/core";
 import fastGlob from "fast-glob";
-import { subtle } from "node:crypto";
+import { webcrypto } from "node:crypto";
 import { existsSync, promises } from "node:fs";
 import { dirname, join as pathJoin } from "node:path";
 
@@ -13,7 +12,10 @@ const publicEnv = /process\.env\.NEXT_PUBLIC_([a-zA-Z\_]+)/g;
  * Calculates the SHA-1 checksum of a given string
  */
 export async function calculateChecksum(fileContent: string): Promise<string> {
-  const checksum = await subtle.digest("SHA-1", encoder.encode(fileContent));
+  const checksum = await webcrypto.subtle.digest(
+    "SHA-1",
+    encoder.encode(fileContent)
+  );
   const checksumStr = Array.from(new Uint8Array(checksum))
     .map((b) => b.toString(16).padStart(2, "0"))
     .join("");
@@ -35,6 +37,7 @@ function getEnvVar(name: string): string {
  * Compiles a file with swc and replace %checksum% with the SHA-1 checksum of the file
  */
 export async function compileFile(filePath: string): Promise<string> {
+  const swc = await getSwcCompiler();
   let fileContent = await promises.readFile(filePath, "utf-8");
 
   // replace process.env.NEXT_PUBLIC_* with the actual value
@@ -42,7 +45,7 @@ export async function compileFile(filePath: string): Promise<string> {
   fileContent = fileContent.replace(publicEnv, (_, envVar) =>
     getEnvVar(envVar)
   );
-  const transformed = await transform(fileContent, getSwcOptions());
+  const transformed = await swc.transform(fileContent, getSwcOptions());
   transformed.code = transformed.code.replace(
     /%checksum%/g,
     await calculateChecksum(transformed.code)
@@ -129,4 +132,21 @@ export function compileFiles(inputFiles: string[]): Promise<void>[] {
     // write compiled file to output directory
     return promises.writeFile(outputFilePath, fileContent);
   });
+}
+
+/**
+ * Get SWC compiler from next.js
+ * or @swc/core (fallback)
+ */
+export async function getSwcCompiler() {
+  try {
+    return await import("next/dist/build/swc/index.js");
+  } catch (e) {
+    // check if @swc/core import is in cache
+    console.warn(
+      "[next-public-ts] Failed to import `next/dist/build/swc`, fallback to `@swc/core`"
+    );
+  }
+  // fallback to @swc/core if next/dist/build/swc is not available
+  return import("@swc/core");
 }
