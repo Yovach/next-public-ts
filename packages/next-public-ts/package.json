@@ -33,11 +33,19 @@
     "webpack",
     "public"
   ],
-  "peerDependencies": {
-    "next": "*"
-  },
   "dependencies": {
-    "@swc/core": "^1.3.95",
     "fast-glob": "^3.3.1"
+  },
+  "peerDependencies": {
+    "next": "*",
+    "@swc/core": "^1.3.95"
+  },
+  "peerDependenciesMeta": {
+    "next": {
+      "optional": true
+    },
+    "@swc/core": {
+      "optional": true
+    }
   }
 }
