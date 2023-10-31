@@ -1,7 +1,7 @@
 import type { Options as SwcOptions } from "@swc/core";
 import { transform } from "@swc/core";
 import fastGlob from "fast-glob";
-import { subtle } from "node:crypto";
+import { webcrypto } from "node:crypto";
 import { existsSync, promises } from "node:fs";
 import { dirname, join as pathJoin } from "node:path";
 
@@ -13,7 +13,10 @@ const publicEnv = /process\.env\.NEXT_PUBLIC_([a-zA-Z\_]+)/g;
  * Calculates the SHA-1 checksum of a given string
  */
 export async function calculateChecksum(fileContent: string): Promise<string> {
-  const checksum = await subtle.digest("SHA-1", encoder.encode(fileContent));
+  const checksum = await webcrypto.subtle.digest(
+    "SHA-1",
+    encoder.encode(fileContent)
+  );
   const checksumStr = Array.from(new Uint8Array(checksum))
     .map((b) => b.toString(16).padStart(2, "0"))
     .join("");
