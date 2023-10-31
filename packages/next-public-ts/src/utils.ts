@@ -134,10 +134,15 @@ export function compileFiles(inputFiles: string[]): Promise<void>[] {
   });
 }
 
+/**
+ * Get SWC compiler from next.js
+ * or @swc/core (fallback)
+ */
 export async function getSwcCompiler() {
   try {
     return await import("next/dist/build/swc/index.js");
   } catch (e) {
+    // check if @swc/core import is in cache
     console.warn(
       "[next-public-ts] Failed to import `next/dist/build/swc`, fallback to `@swc/core`"
     );
