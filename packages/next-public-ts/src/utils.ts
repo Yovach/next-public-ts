@@ -1,5 +1,4 @@
 import type { Options as SwcOptions } from "@swc/core";
-import { transform } from "@swc/core";
 import fastGlob from "fast-glob";
 import { webcrypto } from "node:crypto";
 import { existsSync, promises } from "node:fs";
@@ -38,6 +37,7 @@ function getEnvVar(name: string): string {
  * Compiles a file with swc and replace %checksum% with the SHA-1 checksum of the file
  */
 export async function compileFile(filePath: string): Promise<string> {
+  const swc = await getSwcCompiler();
   let fileContent = await promises.readFile(filePath, "utf-8");
 
   // replace process.env.NEXT_PUBLIC_* with the actual value
@@ -45,7 +45,7 @@ export async function compileFile(filePath: string): Promise<string> {
   fileContent = fileContent.replace(publicEnv, (_, envVar) =>
     getEnvVar(envVar)
   );
-  const transformed = await transform(fileContent, getSwcOptions());
+  const transformed = await swc.transform(fileContent, getSwcOptions());
   transformed.code = transformed.code.replace(
     /%checksum%/g,
     await calculateChecksum(transformed.code)
@@ -132,4 +132,16 @@ export function compileFiles(inputFiles: string[]): Promise<void>[] {
     // write compiled file to output directory
     return promises.writeFile(outputFilePath, fileContent);
   });
+}
+
+export async function getSwcCompiler() {
+  try {
+    return await import("next/dist/build/swc/index.js");
+  } catch (e) {
+    console.warn(
+      "[next-public-ts] Failed to import `next/dist/build/swc`, fallback to `@swc/core`"
+    );
+  }
+  // fallback to @swc/core if next/dist/build/swc is not available
+  return import("@swc/core");
 }
