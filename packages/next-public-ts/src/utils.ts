@@ -2,9 +2,12 @@ import type { Options as SwcOptions } from "@swc/core";
 import { webcrypto } from "node:crypto";
 import { existsSync, promises } from "node:fs";
 import { dirname, join as pathJoin } from "node:path";
-
-const encoder = new TextEncoder();
-const publicEnv = /process\.env\.NEXT_PUBLIC_([a-zA-Z\_]+)/g;
+import {
+  HANDLED_GLOB_EXTENSIONS,
+  HANDLED_REGEX_EXTENSIONS,
+  PUBLIC_ENV_REGEX,
+  encoder,
+} from "./constants";
 
 type SwcCompiler = Awaited<ReturnType<typeof getSwcCompiler>>;
 
@@ -14,7 +17,7 @@ type SwcCompiler = Awaited<ReturnType<typeof getSwcCompiler>>;
 export async function calculateChecksum(fileContent: string): Promise<string> {
   const checksum = await webcrypto.subtle.digest(
     "SHA-1",
-    encoder.encode(fileContent)
+    encoder.encode(fileContent),
   );
   const checksumStr = Array.from(new Uint8Array(checksum))
     .map((b) => b.toString(16).padStart(2, "0"))
@@ -26,7 +29,7 @@ function getEnvVar(name: string): string {
   const value = process.env[`NEXT_PUBLIC_${name}`];
   if (!value) {
     console.warn(
-      `[next-public-ts] Environment variable NEXT_PUBLIC_${name} is not defined`
+      `[next-public-ts] Environment variable NEXT_PUBLIC_${name} is not defined`,
     );
     return '""';
   }
@@ -38,20 +41,20 @@ function getEnvVar(name: string): string {
  */
 export async function compileFile(
   compiler: SwcCompiler,
-  filePath: string
+  filePath: string,
 ): Promise<string> {
   let fileContent = await promises.readFile(filePath, "utf-8");
 
   // replace process.env.NEXT_PUBLIC_* with the actual value
   // or an empty string if it's not defined
-  fileContent = fileContent.replace(publicEnv, (_, envVar) =>
-    getEnvVar(envVar)
+  fileContent = fileContent.replace(PUBLIC_ENV_REGEX, (_, envVar) =>
+    getEnvVar(envVar),
   );
 
   const transformed = await compiler.transform(fileContent, getSwcOptions());
   transformed.code = transformed.code.replace(
     /%checksum%/g,
-    await calculateChecksum(transformed.code)
+    await calculateChecksum(transformed.code),
   );
   return transformed.code;
 }
@@ -94,11 +97,11 @@ async function createDirectoryIfNotExists(dir: string) {
  */
 export async function compileDirectories(
   directories: string[],
-  outputDir: string
+  outputDir: string,
 ) {
   const swc = await getSwcCompiler();
   for (const directory of directories) {
-    const files = await glob(directory + "/**/*.ts");
+    const files = await glob(`${directory}/**/*.${HANDLED_GLOB_EXTENSIONS}`);
     for (const file of files) {
       const [, filePath] = file.split(directory, 2);
       if (!filePath) {
@@ -108,7 +111,7 @@ export async function compileDirectories(
       // create output directory if it doesn't exist
       const outputFilePath = pathJoin(
         outputDir,
-        filePath.replace(".ts", ".js")
+        filePath.replace(HANDLED_REGEX_EXTENSIONS, ".js"),
       );
       await createDirectoryIfNotExists(outputFilePath);
 
@@ -154,7 +157,7 @@ export async function getSwcCompiler() {
     return await import("next/dist/build/swc/index.js");
   } catch (e) {
     console.warn(
-      "[next-public-ts] Failed to import `next/dist/build/swc`, fallback to `@swc/core`"
+      "[next-public-ts] Failed to import `next/dist/build/swc`, fallback to `@swc/core`",
     );
   }
   // fallback to @swc/core if next/dist/build/swc is not available
@@ -170,7 +173,7 @@ export async function getGlobPackage() {
     return import("next/dist/compiled/glob/glob.js");
   } catch (e) {
     console.warn(
-      "[next-public-ts] Failed to import `next/dist/compiled/glob`, fallback to `glob`"
+      "[next-public-ts] Failed to import `next/dist/compiled/glob`, fallback to `glob`",
     );
   }
   // fallback to glob if next/dist/compiled/glob is not available
@@ -190,7 +193,7 @@ export async function glob(pattern: string) {
         } else {
           resolve(matches);
         }
-      }
+      },
     );
   });
 }

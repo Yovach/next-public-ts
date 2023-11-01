@@ -31,7 +31,7 @@ const nextConfig = {
     config.plugins.push(
       new NextPublicTsPlugin({
         autoDetect: true,
-      })
+      }),
     );
     return config;
   },
@@ -54,7 +54,7 @@ const nextConfig = {
       new NextPublicTsPlugin({
         inputDir: path.join("src", "app", "+public"),
         outputDir: path.join("public"),
-      })
+      }),
     );
     return config;
   },

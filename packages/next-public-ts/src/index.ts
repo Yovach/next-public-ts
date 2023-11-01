@@ -1,4 +1,5 @@
 import type { Compiler } from "webpack";
+import { HANDLED_GLOB_EXTENSIONS } from "./constants";
 import { compileDirectories, compileFiles, glob } from "./utils";
 
 type PluginOptions = {
@@ -44,7 +45,7 @@ class NextPublicTsPlugin {
 
   async compilationPromises() {
     if (this.#autoDetect) {
-      const files = await glob("**/+public/**/*.ts");
+      const files = await glob(`**/+public/**/*.${HANDLED_GLOB_EXTENSIONS}`);
       return compileFiles(files);
     }
 
@@ -73,7 +74,7 @@ class NextPublicTsPlugin {
           } catch (e) {
             console.error(e);
           }
-        }
+        },
       );
     });
   }
