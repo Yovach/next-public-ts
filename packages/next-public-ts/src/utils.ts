@@ -80,6 +80,9 @@ export function getSwcOptions(): SwcOptions {
   };
 }
 
+/**
+ * Creates a directory if it doesn't exist
+ */
 async function createDirectoryIfNotExists(dir: string) {
   if (!existsSync(dir)) {
     await promises.mkdir(dirname(dir), { recursive: true });
