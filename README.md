@@ -1,1 +1,1 @@
-./packages/next-public-ts/README.md
+./packages/next-public/README.md

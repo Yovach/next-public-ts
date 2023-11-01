@@ -29,7 +29,7 @@ function getEnvVar(name: string): string {
   const value = process.env[`NEXT_PUBLIC_${name}`];
   if (!value) {
     console.warn(
-      `[next-public-ts] Environment variable NEXT_PUBLIC_${name} is not defined`,
+      `[next-public] Environment variable NEXT_PUBLIC_${name} is not defined`,
     );
     return '""';
   }
@@ -157,7 +157,7 @@ export async function getSwcCompiler() {
     return await import("next/dist/build/swc/index.js");
   } catch (e) {
     console.warn(
-      "[next-public-ts] Failed to import `next/dist/build/swc`, fallback to `@swc/core`",
+      "[next-public] Failed to import `next/dist/build/swc`, fallback to `@swc/core`",
     );
   }
   // fallback to @swc/core if next/dist/build/swc is not available
@@ -173,7 +173,7 @@ export async function getGlobPackage() {
     return import("next/dist/compiled/glob/glob.js");
   } catch (e) {
     console.warn(
-      "[next-public-ts] Failed to import `next/dist/compiled/glob`, fallback to `glob`",
+      "[next-public] Failed to import `next/dist/compiled/glob`, fallback to `glob`",
     );
   }
   // fallback to glob if next/dist/compiled/glob is not available

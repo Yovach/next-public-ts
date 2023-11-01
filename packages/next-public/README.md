@@ -1,4 +1,4 @@
-# next-public-ts
+# next-public
 
 A webpack plugin to compile TypeScript files in the public folder of a Next.js project.\
 I created this Webpack plugin because I wanted to use TypeScript in the public folder of my Next.js project but Next.js doesn't support this out of the box.
@@ -15,7 +15,7 @@ I created this Webpack plugin because I wanted to use TypeScript in the public f
 ## Installation
 
 ```bash
-npm install --save-dev next-public-ts
+npm install --save-dev next-public
 ```
 
 ## Usage
@@ -24,7 +24,7 @@ npm install --save-dev next-public-ts
 
 ```js
 // next.config.js
-const { NextPublicTsPlugin } = require("next-public-ts");
+const { NextPublicTsPlugin } = require("next-public");
 
 const nextConfig = {
   webpack(config, context) {
@@ -43,7 +43,7 @@ const nextConfig = {
 ```js
 // next.config.mjs
 import path from "node:path";
-import { NextPublicTsPlugin } from "next-public-ts";
+import { NextPublicTsPlugin } from "next-public";
 
 /**
  * @type {import('next').NextConfig}
@@ -65,7 +65,7 @@ export default nextConfig;
 
 ## Examples
 
-You can find examples in the [examples](https://github.com/Yovach/next-public-ts/tree/main/examples) directory.
+You can find examples in the [examples](https://github.com/Yovach/next-public/tree/main/examples) directory.
 
 ## Plugin options
 
