@@ -11,7 +11,7 @@ on:
 
 defaults:
   run:
-    working-directory: packages/next-public-ts
+    working-directory: packages/next-public
 
 jobs:
   build-publish:

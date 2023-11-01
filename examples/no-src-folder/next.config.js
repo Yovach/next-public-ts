@@ -1,4 +1,4 @@
-const { NextPublicTsPlugin } = require("next-public-ts");
+const { NextPublicTsPlugin } = require("next-public");
 const path = require("node:path");
 
 /** @type {import('next').NextConfig} */

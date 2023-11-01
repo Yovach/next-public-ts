@@ -1,4 +1,4 @@
-import { NextPublicTsPlugin } from "next-public-ts";
+import { NextPublicTsPlugin } from "next-public";
 import path from "path";
 
 /** @type {import('next').NextConfig} */
