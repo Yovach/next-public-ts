@@ -1,6 +1,5 @@
-import fastGlob from "fast-glob";
 import type { Compiler } from "webpack";
-import { compileDirectory, compileFiles } from "./utils";
+import { compileDirectories, compileFiles, glob } from "./utils";
 
 type PluginOptions = {
   enabled?: boolean;
@@ -16,7 +15,7 @@ type PluginOptions = {
 );
 
 class NextPublicTsPlugin {
-  #input: string[];
+  #input?: string[];
   #output: string;
 
   #enabled: boolean;
@@ -38,11 +37,22 @@ class NextPublicTsPlugin {
       this.#input = inputDir;
       this.#output = outputDir;
     } else {
-      this.#output = "public";
       this.#autoDetect = true;
-
-      this.#input = fastGlob.sync(["**/+public/**/*.ts", "!**/public"]);
+      this.#output = "public";
     }
+  }
+
+  async compilationPromises() {
+    if (this.#autoDetect) {
+      const files = await glob("**/+public/**/*.ts");
+      return compileFiles(files);
+    }
+
+    if (!this.#input) {
+      return;
+    }
+
+    return compileDirectories(this.#input, this.#output);
   }
 
   apply(compiler: Compiler) {
@@ -59,17 +69,11 @@ class NextPublicTsPlugin {
         },
         async () => {
           try {
-            await Promise.all(
-              this.#autoDetect
-                ? compileFiles(this.#input)
-                : this.#input.map(async (inputDir) =>
-                    compileDirectory(inputDir, this.#output),
-                  ),
-            );
+            await this.compilationPromises();
           } catch (e) {
             console.error(e);
           }
-        },
+        }
       );
     });
   }
