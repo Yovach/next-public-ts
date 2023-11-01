@@ -164,21 +164,21 @@ export async function getSwcCompiler() {
  */
 export async function getGlobPackage() {
   try {
-    return (await import("next/dist/compiled/glob/glob.js")).default;
+    return import("next/dist/compiled/glob/glob.js");
   } catch (e) {
     console.warn(
       "[next-public-ts] Failed to import `next/dist/compiled/glob`, fallback to `glob`"
     );
   }
   // fallback to glob if next/dist/compiled/glob is not available
-  return (await import("glob")).default;
+  return import("glob");
 }
 
 export async function glob(pattern: string) {
   const globPkg = await getGlobPackage();
 
   return new Promise<string[]>((resolve, reject) => {
-    globPkg(
+    globPkg.default(
       pattern,
       { ignore: ["node_modules/**", "public"] },
       (err, matches) => {
