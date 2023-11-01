@@ -1,5 +1,4 @@
 import type { Options as SwcOptions } from "@swc/core";
-import fastGlob from "fast-glob";
 import { webcrypto } from "node:crypto";
 import { existsSync, promises } from "node:fs";
 import { dirname, join as pathJoin } from "node:path";
@@ -77,61 +76,59 @@ export function getSwcOptions(): SwcOptions {
   };
 }
 
+async function createDirectoryIfNotExists(dir: string) {
+  if (!existsSync(dir)) {
+    await promises.mkdir(dirname(dir), { recursive: true });
+  }
+}
+
 /**
  * Compiles files in a directory
  */
-export function compileDirectory(
+export async function compileDirectory(
   inputDir: string,
   outputDir: string
-): Promise<void>[] {
-  const files = fastGlob.sync([inputDir + "/**/*.ts", "!**/public"]);
-  return files.map(async (file) => {
+) {
+  const files = await glob(inputDir + "/**/*.ts");
+  for (const file of files) {
     const [, filePath] = file.split(inputDir, 2);
     if (!filePath) {
       throw new Error("Invalid file path");
     }
-
+  
     // create output directory if it doesn't exist
     const outputFilePath = pathJoin(outputDir, filePath.replace(".ts", ".js"));
-    if (!existsSync(outputFilePath)) {
-      await promises.mkdir(dirname(outputFilePath), {
-        recursive: true,
-      });
-    }
-
+    await createDirectoryIfNotExists(outputFilePath);
+  
     // compile file with swc (from next.js)
     const inputFilePath = pathJoin(inputDir, filePath);
     const fileContent = await compileFile(inputFilePath);
-
+  
     // write compiled file to output directory
-    return promises.writeFile(outputFilePath, fileContent);
-  });
+    await promises.writeFile(outputFilePath, fileContent);
+  }
 }
 
 /**
  * Compiles a list of files
  */
-export function compileFiles(inputFiles: string[]): Promise<void>[] {
-  return inputFiles.map(async (file) => {
+export async function compileFiles(inputFiles: string[]) {
+  for (const file of inputFiles) {
     const [, filePath] = file.split("+public/", 2);
     if (!filePath) {
       throw new Error("Invalid file path");
     }
-
+  
     // create output directory if it doesn't exist
     const outputFilePath = pathJoin("public", filePath.replace(".ts", ".js"));
-    if (!existsSync(outputFilePath)) {
-      await promises.mkdir(dirname(outputFilePath), {
-        recursive: true,
-      });
-    }
-
+    await createDirectoryIfNotExists(outputFilePath);
+  
     // compile file with swc (from next.js)
     const fileContent = await compileFile(file);
-
+  
     // write compiled file to output directory
-    return promises.writeFile(outputFilePath, fileContent);
-  });
+    await promises.writeFile(outputFilePath, fileContent);
+  }
 }
 
 /**
@@ -140,13 +137,46 @@ export function compileFiles(inputFiles: string[]): Promise<void>[] {
  */
 export async function getSwcCompiler() {
   try {
-    return await import("next/dist/build/swc/index.js");
+    return await import("next/dist/build/swc");
   } catch (e) {
-    // check if @swc/core import is in cache
     console.warn(
       "[next-public-ts] Failed to import `next/dist/build/swc`, fallback to `@swc/core`"
     );
   }
   // fallback to @swc/core if next/dist/build/swc is not available
   return import("@swc/core");
+}
+
+/**
+ * Get compiled `glob` package from next.js
+ * or glob (fallback)
+ */
+export async function getGlobPackage() {
+  try {
+    return await import("next/dist/compiled/glob");
+  } catch (e) {
+    console.warn(
+      "[next-public-ts] Failed to import `next/dist/compiled/glob`, fallback to `glob`"
+    );
+  }
+  // fallback to glob if next/dist/compiled/glob is not available
+  return import("glob");
+}
+
+export async function glob(pattern: string) {
+  const globPkg = await getGlobPackage();
+
+  return new Promise<string[]>((resolve, reject) => {
+    globPkg.glob(
+      pattern,
+      { ignore: ["node_modules/**", "public"] },
+      (err, matches) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(matches);
+        }
+      }
+    );
+  });
 }
