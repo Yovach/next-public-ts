@@ -1,4 +1,4 @@
-declare module 'next/dist/compiled/glob' {
+declare module 'next/dist/compiled/glob/glob.js' {
   import m from 'glob'
   export = m
 }

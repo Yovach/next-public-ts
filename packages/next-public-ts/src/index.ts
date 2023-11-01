@@ -1,5 +1,5 @@
 import type { Compiler } from "webpack";
-import { compileDirectory, compileFiles, glob } from "./utils";
+import { compileDirectories, compileFiles, glob } from "./utils";
 
 type PluginOptions = {
   enabled?: boolean;
@@ -52,7 +52,7 @@ class NextPublicTsPlugin {
       return;
     }
 
-    return Promise.all(this.#input?.map((inputDir) => compileDirectory(inputDir, this.#output)));
+    return compileDirectories(this.#input, this.#output);
   }
 
   apply(compiler: Compiler) {
