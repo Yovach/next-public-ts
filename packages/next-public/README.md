@@ -65,7 +65,7 @@ export default nextConfig;
 
 ## Examples
 
-You can find examples in the [examples](https://github.com/Yovach/next-public/tree/main/examples) directory.
+You can find examples in the [examples](./examples) directory.
 
 ## Plugin options
 
