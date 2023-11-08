@@ -137,7 +137,10 @@ export async function compileFiles(inputFiles: string[]) {
     }
 
     // create output directory if it doesn't exist
-    const outputFilePath = pathJoin("public", filePath.replace(".ts", ".js"));
+    const outputFilePath = pathJoin(
+      "public",
+      filePath.replace(HANDLED_REGEX_EXTENSIONS, ".js")
+    );
     await createDirectoryIfNotExists(outputFilePath);
 
     // compile file with swc (from next.js)
