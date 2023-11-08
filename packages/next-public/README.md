@@ -8,7 +8,7 @@ I created this Webpack plugin because I wanted to use TypeScript in the public f
 - Write your `Service Workers` and your `Web Workers` in TypeScript
 - Handle `process.env.NEXT_PUBLIC_*` in your TypeScript files
 - Compile and minify your TypeScript files
-- Auto-detect `*.ts` with `autoDetect` option and `+public` directory
+- Detect files to compile with `autoDetect` option and `+public` directory
 - Inject a **SHA-1** hash of the file content into `%checksum%` variable in the compiled file
 - Support for CommonJS and ES modules
 
