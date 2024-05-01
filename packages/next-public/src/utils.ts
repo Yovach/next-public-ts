@@ -5,8 +5,15 @@ import { dirname, join as pathJoin } from "node:path";
 import {
   HANDLED_GLOB_EXTENSIONS,
   HANDLED_REGEX_EXTENSIONS,
-  PUBLIC_ENV_REGEX,
 } from "./constants";
+
+/**
+ * Regex pattern for public environment variables
+ * Used to replace `process.env.NEXT_PUBLIC_*` with the actual value (or "" if it's not defined)
+ */
+const PUBLIC_ENV_REGEX = /process\.env\.NEXT_PUBLIC_([a-zA-Z\_]+)/g;
+
+const CHECKSUM_REGEX = /%checksum%/g;
 
 /**
  * Calculates the SHA-1 checksum of a given string
@@ -45,7 +52,7 @@ export async function compileFile(
   // replace %checksum% with the checksum of the file
   // can be used for service worker versioning
   transformed.code = transformed.code.replace(
-    /%checksum%/g,
+    CHECKSUM_REGEX,
     await calculateChecksum(transformed.code),
   )
 
