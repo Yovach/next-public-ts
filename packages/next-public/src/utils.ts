@@ -1,26 +1,25 @@
-import { type Options as SwcOptions } from "@swc/core";
-import { webcrypto } from "node:crypto";
-import { mkdir, writeFile  } from "node:fs/promises";
+import type { Options as SwcOptions } from "@swc/core";
+import crypto from "node:crypto";
+import { mkdir, writeFile } from "node:fs/promises";
 import { dirname, join as pathJoin } from "node:path";
 import {
   HANDLED_GLOB_EXTENSIONS,
   HANDLED_REGEX_EXTENSIONS,
   PUBLIC_ENV_REGEX,
-  encoder,
 } from "./constants";
 
 /**
  * Calculates the SHA-1 checksum of a given string
  */
 export async function calculateChecksum(fileContent: string): Promise<string> {
-  const checksum = await webcrypto.subtle.digest(
-    "SHA-1",
-    encoder.encode(fileContent),
-  );
-  const checksumStr = Array.from(new Uint8Array(checksum))
-    .map((b) => b.toString(16).padStart(2, "0"))
-    .join("");
-  return checksumStr;
+  if ("hash" in crypto) {
+    // @ts-ignore
+    return crypto.hash("sha1", fileContent);
+  }
+
+  const hash = crypto.createHash("sha1");
+  const checksum = hash.update(fileContent);
+  return checksum.digest('hex');
 }
 
 function getEnvVar(name: string): string {

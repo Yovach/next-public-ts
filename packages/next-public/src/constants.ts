@@ -20,4 +20,3 @@ export const HANDLED_REGEX_EXTENSIONS = new RegExp(
  */
 export const PUBLIC_ENV_REGEX = /process\.env\.NEXT_PUBLIC_([a-zA-Z\_]+)/g;
 
-export const encoder = new TextEncoder();
