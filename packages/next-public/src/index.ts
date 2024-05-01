@@ -44,8 +44,8 @@ class NextPublicTsPlugin {
 
   async compilationPromises() {
     const { compileFiles, compileDirectories } = await import("./utils.js");
-    const { glob } = await import("glob");
     if (this.#autoDetect) {
+      const { glob } = await import("glob");
       const files = await glob(`**/+public/**/*.${HANDLED_GLOB_EXTENSIONS}`);
       return compileFiles(files);
     }
@@ -62,12 +62,11 @@ class NextPublicTsPlugin {
       return;
     }
 
-    const { webpack } = compiler;
     compiler.hooks.compilation.tap("NextPublicTsPlugin", (compilation) => {
       compilation.hooks.processAssets.tapPromise(
         {
           name: "NextPublicTsPlugin",
-          stage: webpack.Compilation.PROCESS_ASSETS_STAGE_ADDITIONAL,
+          stage: compiler.webpack.Compilation.PROCESS_ASSETS_STAGE_ADDITIONAL,
         },
         async () => {
           try {
