@@ -21,7 +21,7 @@
   "devDependencies": {
     "@swc/core": "^1.3.95",
     "@types/glob": "^8.1.0",
-    "tsup": "^7.2.0",
+    "tsup": "^8.0.2",
     "typescript": "^5.2.2",
     "webpack": "^5.89.0"
   },
@@ -37,8 +37,8 @@
   ],
   "peerDependencies": {
     "@swc/core": "^1.3.95",
-    "glob": "^7.1.6",
-    "next": "*"
+    "glob": "^10.3.12",
+    "next": "^14.2.3"
   },
   "peerDependenciesMeta": {
     "glob": {
