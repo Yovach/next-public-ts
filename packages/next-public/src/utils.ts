@@ -1,6 +1,6 @@
-import type { Options as SwcOptions } from "@swc/core";
+import { type Options as SwcOptions } from "@swc/core";
 import { webcrypto } from "node:crypto";
-import { existsSync, promises } from "node:fs";
+import { mkdir, writeFile  } from "node:fs/promises";
 import { dirname, join as pathJoin } from "node:path";
 import {
   HANDLED_GLOB_EXTENSIONS,
@@ -8,8 +8,6 @@ import {
   PUBLIC_ENV_REGEX,
   encoder,
 } from "./constants";
-import { transform } from "@swc/core";
-import { glob } from "glob";
 
 /**
  * Calculates the SHA-1 checksum of a given string
@@ -42,19 +40,23 @@ function getEnvVar(name: string): string {
 export async function compileFile(
   filePath: string,
 ): Promise<string> {
-  let fileContent = await promises.readFile(filePath, "utf-8");
+  const { transformFile } = await import("@swc/core");
 
-  // replace process.env.NEXT_PUBLIC_* with the actual value
-  // or an empty string if it's not defined
-  fileContent = fileContent.replace(PUBLIC_ENV_REGEX, (_, envVar) =>
-    getEnvVar(envVar),
-  );
-
-  const transformed = await transform(fileContent, getSwcOptions());
+  const transformed = await transformFile(filePath, getSwcOptions());
+  // replace %checksum% with the checksum of the file
+  // can be used for service worker versioning
   transformed.code = transformed.code.replace(
     /%checksum%/g,
     await calculateChecksum(transformed.code),
+  )
+
+  // replace process.env.NEXT_PUBLIC_* with the actual value
+  // or an empty string if it's not defined
+  transformed.code = transformed.code.replace(PUBLIC_ENV_REGEX, (_, envVar) =>
+    getEnvVar(envVar),
   );
+
+
   return transformed.code;
 }
 
@@ -86,9 +88,7 @@ export function getSwcOptions(): SwcOptions {
  * Creates a directory if it doesn't exist
  */
 async function createDirectoryIfNotExists(dir: string) {
-  if (!existsSync(dir)) {
-    await promises.mkdir(dirname(dir), { recursive: true });
-  }
+  await mkdir(dirname(dir), { recursive: true });
 }
 
 /**
@@ -98,6 +98,7 @@ export async function compileDirectories(
   directories: string[],
   outputDir: string,
 ) {
+  const { glob } = await import("glob");
   for (const directory of directories) {
     const files = await glob(`${directory}/**/*.${HANDLED_GLOB_EXTENSIONS}`);
     for (const file of files) {
@@ -118,7 +119,7 @@ export async function compileDirectories(
       const fileContent = await compileFile(inputFilePath);
 
       // write compiled file to output directory
-      await promises.writeFile(outputFilePath, fileContent);
+      await writeFile(outputFilePath, fileContent);
     }
   }
 }
@@ -144,7 +145,7 @@ export async function compileFiles(inputFiles: string[]) {
     const fileContent = await compileFile(file);
 
     // write compiled file to output directory
-    await promises.writeFile(outputFilePath, fileContent);
+    await writeFile(outputFilePath, fileContent);
   }
 }
 
