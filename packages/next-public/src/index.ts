@@ -1,19 +1,20 @@
 import type { Compiler } from "webpack";
 import { HANDLED_GLOB_EXTENSIONS } from "./constants";
-import { compileDirectories, compileFiles, glob } from "./utils";
+import { glob } from "glob";
+import { compileDirectories, compileFiles } from "./utils";
 
 type PluginOptions = {
   enabled?: boolean;
 } & (
-  | {
+    | {
       inputDir: string | string[];
       outputDir: string;
       autoDetect?: false;
     }
-  | {
+    | {
       autoDetect: true;
     }
-);
+  );
 
 class NextPublicTsPlugin {
   #input?: string[];

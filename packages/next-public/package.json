@@ -19,7 +19,6 @@
     }
   },
   "devDependencies": {
-    "@swc/core": "^1.3.95",
     "@types/glob": "^8.1.0",
     "tsup": "^8.0.2",
     "typescript": "^5.2.2",
@@ -35,20 +34,8 @@
     "webpack",
     "public"
   ],
-  "peerDependencies": {
+  "dependencies": {
     "@swc/core": "^1.3.95",
-    "glob": "^10.3.12",
-    "next": "^14.2.3"
-  },
-  "peerDependenciesMeta": {
-    "glob": {
-      "optional": true
-    },
-    "next": {
-      "optional": true
-    },
-    "@swc/core": {
-      "optional": true
-    }
+    "glob": "^10.3.12"
   }
 }
