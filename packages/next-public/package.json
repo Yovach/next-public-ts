@@ -1,6 +1,6 @@
 {
   "name": "next-public",
-  "version": "0.4.2",
+  "version": "0.5.0",
   "description": "A webpack plugin to compile TypeScript files in the public folder of a Next.js project.",
   "license": "MIT",
   "bugs": "https://github.com/Yovach/next-public-ts/issues",
@@ -19,9 +19,7 @@
     }
   },
   "devDependencies": {
-    "@swc/core": "^1.3.95",
-    "@types/glob": "^8.1.0",
-    "tsup": "^7.2.0",
+    "tsup": "^8.0.2",
     "typescript": "^5.2.2",
     "webpack": "^5.89.0"
   },
@@ -35,20 +33,8 @@
     "webpack",
     "public"
   ],
-  "peerDependencies": {
+  "dependencies": {
     "@swc/core": "^1.3.95",
-    "glob": "^7.1.6",
-    "next": "*"
-  },
-  "peerDependenciesMeta": {
-    "glob": {
-      "optional": true
-    },
-    "next": {
-      "optional": true
-    },
-    "@swc/core": {
-      "optional": true
-    }
+    "glob": "^10.3.12"
   }
 }

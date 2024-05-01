@@ -1,19 +1,18 @@
 import type { Compiler } from "webpack";
 import { HANDLED_GLOB_EXTENSIONS } from "./constants";
-import { compileDirectories, compileFiles, glob } from "./utils";
 
 type PluginOptions = {
   enabled?: boolean;
 } & (
-  | {
+    | {
       inputDir: string | string[];
       outputDir: string;
       autoDetect?: false;
     }
-  | {
+    | {
       autoDetect: true;
     }
-);
+  );
 
 class NextPublicTsPlugin {
   #input?: string[];
@@ -44,7 +43,9 @@ class NextPublicTsPlugin {
   }
 
   async compilationPromises() {
+    const { compileFiles, compileDirectories } = await import("./utils.js");
     if (this.#autoDetect) {
+      const { glob } = await import("glob");
       const files = await glob(`**/+public/**/*.${HANDLED_GLOB_EXTENSIONS}`);
       return compileFiles(files);
     }
@@ -61,12 +62,11 @@ class NextPublicTsPlugin {
       return;
     }
 
-    const { webpack } = compiler;
     compiler.hooks.compilation.tap("NextPublicTsPlugin", (compilation) => {
       compilation.hooks.processAssets.tapPromise(
         {
           name: "NextPublicTsPlugin",
-          stage: webpack.Compilation.PROCESS_ASSETS_STAGE_ADDITIONAL,
+          stage: compiler.webpack.Compilation.PROCESS_ASSETS_STAGE_ADDITIONAL,
         },
         async () => {
           try {
