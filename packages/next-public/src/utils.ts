@@ -37,11 +37,31 @@ function getEnvVar(name: string): string {
   return `"${value}"`;
 }
 
+export async function transformFileContent(fileCntent: string) {
+  const { transform } = await import("@swc/core");
+
+  const transformed = await transform(fileCntent, getSwcOptions());
+  // replace %checksum% with the checksum of the file
+  // can be used for service worker versioning
+  transformed.code = transformed.code.replace(
+    CHECKSUM_REGEX,
+    await calculateChecksum(transformed.code),
+  );
+
+  // replace process.env.NEXT_PUBLIC_* with the actual value
+  // or an empty string if it's not defined
+  transformed.code = transformed.code.replace(PUBLIC_ENV_REGEX, (_, envVar) =>
+    getEnvVar(envVar),
+  );
+
+  return transformed.code;
+}
+
 /**
  * Compiles a file with swc and replace %checksum% with the SHA-1 checksum of the file
  */
 export async function compileFile(filePath: string): Promise<string> {
-  const { transformFile } = await import("@swc/core");
+  const { transformFile} = await import("@swc/core");
 
   const transformed = await transformFile(filePath, getSwcOptions());
   // replace %checksum% with the checksum of the file
