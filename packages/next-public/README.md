@@ -82,3 +82,7 @@ You can find examples in the [examples](./examples) directory.
 
 - `outputDir` :
   A string representing the path to the directory where the compiled JavaScript files will be written.
+
+## Warning
+
+We currently do not support Turbopack.
