@@ -3,6 +3,7 @@ import { HANDLED_GLOB_EXTENSIONS } from "./constants";
 
 type PluginOptions = {
   enabled?: boolean;
+  shouldLog?: boolean;
 } & (
     | {
       inputDir: string | string[];
@@ -20,6 +21,7 @@ class NextPublicTsPlugin {
 
   #enabled: boolean;
   #autoDetect: boolean = false;
+  #shouldLog: boolean = false;
   constructor(options: PluginOptions) {
     if (!options) {
       throw new Error("`options` is required");
@@ -40,6 +42,8 @@ class NextPublicTsPlugin {
       this.#autoDetect = true;
       this.#output = "public";
     }
+
+    this.#shouldLog = options.shouldLog ?? false;
   }
 
   async compilationPromises() {
@@ -47,14 +51,14 @@ class NextPublicTsPlugin {
     if (this.#autoDetect) {
       const { glob } = await import("glob");
       const files = await glob(`**/+public/**/*.${HANDLED_GLOB_EXTENSIONS}`);
-      return compileFiles(files);
+      return compileFiles(files, this.#shouldLog);
     }
 
     if (!this.#input) {
       return;
     }
 
-    return compileDirectories(this.#input, this.#output);
+    return compileDirectories(this.#input, this.#output, this.#shouldLog);
   }
 
   apply(compiler: Compiler) {

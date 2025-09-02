@@ -2,10 +2,7 @@ import type { Options as SwcOptions } from "@swc/core";
 import crypto from "node:crypto";
 import { mkdir, writeFile } from "node:fs/promises";
 import { dirname, join as pathJoin } from "node:path";
-import {
-  HANDLED_GLOB_EXTENSIONS,
-  HANDLED_REGEX_EXTENSIONS,
-} from "./constants";
+import { HANDLED_GLOB_EXTENSIONS, HANDLED_REGEX_EXTENSIONS } from "./constants";
 
 /**
  * Regex pattern for public environment variables
@@ -26,14 +23,14 @@ export async function calculateChecksum(fileContent: string): Promise<string> {
 
   const hash = crypto.createHash("sha1");
   const checksum = hash.update(fileContent);
-  return checksum.digest('hex');
+  return checksum.digest("hex");
 }
 
 function getEnvVar(name: string): string {
   const value = process.env[`NEXT_PUBLIC_${name}`];
   if (!value) {
     console.warn(
-      `[next-public] Environment variable NEXT_PUBLIC_${name} is not defined`,
+      `\n[next-public] Environment variable NEXT_PUBLIC_${name} is not defined\n`,
     );
     return '""';
   }
@@ -43,9 +40,7 @@ function getEnvVar(name: string): string {
 /**
  * Compiles a file with swc and replace %checksum% with the SHA-1 checksum of the file
  */
-export async function compileFile(
-  filePath: string,
-): Promise<string> {
+export async function compileFile(filePath: string): Promise<string> {
   const { transformFile } = await import("@swc/core");
 
   const transformed = await transformFile(filePath, getSwcOptions());
@@ -54,14 +49,13 @@ export async function compileFile(
   transformed.code = transformed.code.replace(
     CHECKSUM_REGEX,
     await calculateChecksum(transformed.code),
-  )
+  );
 
   // replace process.env.NEXT_PUBLIC_* with the actual value
   // or an empty string if it's not defined
   transformed.code = transformed.code.replace(PUBLIC_ENV_REGEX, (_, envVar) =>
     getEnvVar(envVar),
   );
-
 
   return transformed.code;
 }
@@ -103,10 +97,14 @@ async function createDirectoryIfNotExists(dir: string) {
 export async function compileDirectories(
   directories: string[],
   outputDir: string,
+  shouldLog: boolean = false,
 ) {
   const { glob } = await import("glob");
   for (const directory of directories) {
     const files = await glob(`${directory}/**/*.${HANDLED_GLOB_EXTENSIONS}`);
+    if (shouldLog) {
+      console.debug(`\n[next-public] Compiling ${files.length} files\n`);
+    }
     for (const file of files) {
       const [, filePath] = file.split(directory, 2);
       if (!filePath) {
@@ -123,9 +121,16 @@ export async function compileDirectories(
       // compile file with swc (from next.js)
       const inputFilePath = pathJoin(directory, filePath);
       const fileContent = await compileFile(inputFilePath);
+      if (shouldLog) {
+        console.debug(`\n[next-public] Compiled ${outputFilePath}\n`);
+      }
 
       // write compiled file to output directory
       await writeFile(outputFilePath, fileContent);
+    }
+
+    if (shouldLog) {
+      console.debug(`\n[next-public] Compiled ${files.length} files\n`);
     }
   }
 }
@@ -133,7 +138,14 @@ export async function compileDirectories(
 /**
  * Compiles a list of files
  */
-export async function compileFiles(inputFiles: string[]) {
+export async function compileFiles(
+  inputFiles: string[],
+  shouldLog: boolean = false,
+) {
+  if (shouldLog) {
+    console.debug(`\n[next-public] Compiling ${inputFiles.length} files\n`);
+  }
+
   for (const file of inputFiles) {
     const [, filePath] = file.split("+public/", 2);
     if (!filePath) {
@@ -152,6 +164,13 @@ export async function compileFiles(inputFiles: string[]) {
 
     // write compiled file to output directory
     await writeFile(outputFilePath, fileContent);
+
+    if (shouldLog) {
+      console.debug(`\n[next-public] Compiled ${outputFilePath}\n`);
+    }
+  }
+
+  if (shouldLog) {
+    console.debug(`\n[next-public] Compiled ${inputFiles.length} files\n`);
   }
 }
-
