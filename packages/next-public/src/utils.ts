@@ -15,7 +15,7 @@ const CHECKSUM_REGEX = /%checksum%/g;
 /**
  * Calculates the SHA-1 checksum of a given string
  */
-export async function calculateChecksum(fileContent: string): Promise<string> {
+async function calculateChecksum(fileContent: string): Promise<string> {
   if ("hash" in crypto) {
     // @ts-ignore
     return crypto.hash("sha1", fileContent);
@@ -60,7 +60,7 @@ export async function transformFileContent(fileCntent: string) {
 /**
  * Compiles a file with swc and replace %checksum% with the SHA-1 checksum of the file
  */
-export async function compileFile(filePath: string): Promise<string> {
+async function compileFile(filePath: string): Promise<string> {
   const { transformFile} = await import("@swc/core");
 
   const transformed = await transformFile(filePath, getSwcOptions());
@@ -84,7 +84,7 @@ export async function compileFile(filePath: string): Promise<string> {
  * Get SWC options for compiling TypeScript files
  * @link https://swc.rs/docs/configuration/swcrc#compilation
  */
-export function getSwcOptions(): SwcOptions {
+function getSwcOptions(): SwcOptions {
   return {
     jsc: {
       parser: {
