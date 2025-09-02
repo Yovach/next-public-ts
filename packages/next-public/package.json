@@ -19,6 +19,7 @@
     }
   },
   "devDependencies": {
+    "@types/node": "^18.19.123",
     "tsup": "^8.0.2",
     "typescript": "^5.2.2",
     "webpack": "^5.89.0"
