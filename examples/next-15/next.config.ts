@@ -4,10 +4,9 @@ import path from "node:path";
 import type webpack from "webpack";
 
 const nextConfig: NextConfig = {
-  output: "export",
   webpack: (config: webpack.Configuration)  => {
     config.plugins?.push(new NextPublicTsPlugin({
-      inputDir: path.join("app", "+public"),
+      inputDir: path.join("src", "app", "+public"),
       outputDir: path.join("public"),
     }));
     return config;
