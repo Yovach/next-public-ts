@@ -5,15 +5,15 @@ type PluginOptions = {
   enabled?: boolean;
   shouldLog?: boolean;
 } & (
-    | {
+  | {
       inputDir: string | string[];
       outputDir: string;
       autoDetect?: false;
     }
-    | {
+  | {
       autoDetect: true;
     }
-  );
+);
 
 class NextPublicTsPlugin {
   #input?: string[];
@@ -31,6 +31,7 @@ class NextPublicTsPlugin {
     if (!options.autoDetect) {
       let { inputDir, outputDir } = options;
       if (!outputDir || !inputDir) {
+        console.error(`[next-public] \`inputDir\` and \`outputDir\` are both required`)
         throw new Error("`inputDir` and `outputDir` are both required");
       } else if (typeof inputDir === "string") {
         inputDir = [inputDir];
@@ -51,10 +52,14 @@ class NextPublicTsPlugin {
     if (this.#autoDetect) {
       const { glob } = await import("glob");
       const files = await glob(`**/+public/**/*.${HANDLED_GLOB_EXTENSIONS}`);
+      if (this.#shouldLog) {
+        console.debug(`[next-public] Detected ${files.length} files`);
+      }
       return compileFiles(files, this.#shouldLog);
     }
 
     if (!this.#input) {
+      console.warn(`[next-public] No input files detected :/`);
       return;
     }
 
