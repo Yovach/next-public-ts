@@ -12,6 +12,13 @@ const PUBLIC_ENV_REGEX = /process\.env\.NEXT_PUBLIC_([a-zA-Z\_]+)/g;
 
 const CHECKSUM_REGEX = /%checksum%/g;
 
+export function addLog(
+  message: string,
+  level: "info" | "warn" | "debug" | "error",
+) {
+  console[level](`[next-public] \n${message}\n`);
+}
+
 /**
  * Calculates the SHA-1 checksum of a given string
  */
@@ -29,9 +36,7 @@ async function calculateChecksum(fileContent: string): Promise<string> {
 function getEnvVar(name: string): string {
   const value = process.env[`NEXT_PUBLIC_${name}`];
   if (!value) {
-    console.warn(
-      `\n[next-public] Environment variable NEXT_PUBLIC_${name} is not defined\n`,
-    );
+    addLog(`Environment variable NEXT_PUBLIC_${name} is not defined`, "warn");
     return '""';
   }
   return `"${value}"`;
@@ -61,7 +66,7 @@ export async function transformFileContent(fileCntent: string) {
  * Compiles a file with swc and replace %checksum% with the SHA-1 checksum of the file
  */
 async function compileFile(filePath: string): Promise<string> {
-  const { transformFile} = await import("@swc/core");
+  const { transformFile } = await import("@swc/core");
 
   const transformed = await transformFile(filePath, getSwcOptions());
   // replace %checksum% with the checksum of the file
@@ -123,7 +128,7 @@ export async function compileDirectories(
   for (const directory of directories) {
     const files = await glob(`${directory}/**/*.${HANDLED_GLOB_EXTENSIONS}`);
     if (shouldLog) {
-      console.debug(`\n[next-public] Compiling ${files.length} files\n`);
+      addLog(`\nCompiling ${files.length} files\n`, "debug");
     }
     for (const file of files) {
       const [, filePath] = file.split(directory, 2);
@@ -142,7 +147,7 @@ export async function compileDirectories(
       const inputFilePath = pathJoin(directory, filePath);
       const fileContent = await compileFile(inputFilePath);
       if (shouldLog) {
-        console.debug(`\n[next-public] Compiled ${outputFilePath}\n`);
+        addLog(`\nCompiled ${outputFilePath}\n`, "debug");
       }
 
       // write compiled file to output directory
@@ -150,7 +155,7 @@ export async function compileDirectories(
     }
 
     if (shouldLog) {
-      console.debug(`\n[next-public] Compiled ${files.length} files\n`);
+      addLog(`\nCompiled ${files.length} files\n`, "debug");
     }
   }
 }
@@ -163,7 +168,7 @@ export async function compileFiles(
   shouldLog: boolean = false,
 ) {
   if (shouldLog) {
-    console.debug(`\n[next-public] Compiling ${inputFiles.length} files\n`);
+    addLog(`\nCompiling ${inputFiles.length} files\n`, "debug");
   }
 
   for (const file of inputFiles) {
@@ -186,11 +191,11 @@ export async function compileFiles(
     await writeFile(outputFilePath, fileContent);
 
     if (shouldLog) {
-      console.debug(`\n[next-public] Compiled ${outputFilePath}\n`);
+      addLog(`\nCompiled ${outputFilePath}\n`, "debug");
     }
   }
 
   if (shouldLog) {
-    console.debug(`\n[next-public] Compiled ${inputFiles.length} files\n`);
+    addLog(`\nCompiled ${inputFiles.length} files\n`, "debug");
   }
 }

@@ -8,12 +8,10 @@ export async function loader(
   sourceMap?: null | string | any,
 ) {
   if (typeof source !== "string") {
-    throw new Error("Only text files are supported by `next-public`")
+    throw new Error("Only text files are supported by `next-public`");
   }
-  const options = this.getOptions();
-  this.cacheable?.();
 
-  console.log(this, options);
+  this.cacheable?.();
 
   return await transformFileContent(source);
 }
