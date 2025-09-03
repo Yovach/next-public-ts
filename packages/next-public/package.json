@@ -4,6 +4,7 @@
   "description": "A webpack plugin to compile TypeScript files in the public folder of a Next.js project.",
   "license": "MIT",
   "bugs": "https://github.com/Yovach/next-public-ts/issues",
+  "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "files": [
