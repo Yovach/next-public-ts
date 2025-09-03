@@ -2,7 +2,7 @@ import type { Options as SwcOptions } from "@swc/core";
 import crypto from "node:crypto";
 import { mkdir, writeFile } from "node:fs/promises";
 import { dirname, join as pathJoin } from "node:path";
-import { HANDLED_GLOB_EXTENSIONS, HANDLED_REGEX_EXTENSIONS } from "./constants";
+import { HANDLED_GLOB_EXTENSIONS, HANDLED_REGEX_EXTENSIONS } from "./constants.ts";
 
 /**
  * Regex pattern for public environment variables
@@ -15,7 +15,7 @@ const CHECKSUM_REGEX = /%checksum%/g;
 export function addLog(
   message: string,
   level: "info" | "warn" | "debug" | "error",
-) {
+): void {
   console[level](`[next-public] \n${message}\n`);
 }
 
@@ -42,7 +42,7 @@ function getEnvVar(name: string): string {
   return `"${value}"`;
 }
 
-export async function transformFileContent(fileCntent: string) {
+export async function transformFileContent(fileCntent: string): Promise<string> {
   const { transform } = await import("@swc/core");
 
   const transformed = await transform(fileCntent, getSwcOptions());
@@ -123,7 +123,7 @@ export async function compileDirectories(
   directories: string[],
   outputDir: string,
   shouldLog: boolean = false,
-) {
+): Promise<void> {
   const { glob } = await import("glob");
   for (const directory of directories) {
     const files = await glob(`${directory}/**/*.${HANDLED_GLOB_EXTENSIONS}`);
@@ -166,7 +166,7 @@ export async function compileDirectories(
 export async function compileFiles(
   inputFiles: string[],
   shouldLog: boolean = false,
-) {
+): Promise<void> {
   if (shouldLog) {
     addLog(`\nCompiling ${inputFiles.length} files\n`, "debug");
   }

@@ -1,7 +1,7 @@
 import type { Compiler } from "webpack";
-import { HANDLED_GLOB_EXTENSIONS } from "./constants";
-import { PluginOptions } from "./types";
-import { addLog } from "./utils";
+import { HANDLED_GLOB_EXTENSIONS } from "./constants.ts";
+import type { PluginOptions } from "./types.ts";
+import { addLog } from "./utils.ts";
 
 class NextPublicTsPlugin {
   #input?: string[];
@@ -34,7 +34,7 @@ class NextPublicTsPlugin {
     this.#shouldLog = options.shouldLog ?? false;
   }
 
-  async compilationPromises() {
+  async compilationPromises(): Promise<void> {
     const { compileFiles, compileDirectories } = await import("./utils.js");
     if (this.#autoDetect) {
       const { glob } = await import("glob");
@@ -53,7 +53,7 @@ class NextPublicTsPlugin {
     return compileDirectories(this.#input, this.#output, this.#shouldLog);
   }
 
-  apply(compiler: Compiler) {
+  apply(compiler: Compiler): void {
     if (!this.#enabled) {
       return;
     }

@@ -1,2 +1,2 @@
-export { NextPublicTsPlugin } from "./plugin";
-export { loader as default } from "./loader";
+export { NextPublicTsPlugin } from "./plugin.ts";
+export { loader as default } from "./loader.ts";

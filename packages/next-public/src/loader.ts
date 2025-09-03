@@ -1,12 +1,12 @@
 // src/index.ts
-import type { LoaderContext, SourceMapDevToolPlugin } from "webpack";
-import { PluginOptions } from "./types";
-import { transformFileContent } from "./utils";
+import type { LoaderContext } from "webpack";
+import type { PluginOptions } from "./types.ts";
+import { transformFileContent } from "./utils.ts";
 export async function loader(
   this: LoaderContext<PluginOptions>,
   source: string | Buffer,
   sourceMap?: null | string | any,
-) {
+): Promise<string> {
   if (typeof source !== "string") {
     throw new Error("Only text files are supported by `next-public`");
   }
