@@ -38,6 +38,7 @@
   ],
   "dependencies": {
     "@swc/core": "1.13.5",
+    "file-loader": "6.2.0",
     "glob": "10.4.5"
   },
   "peerDependencies": {

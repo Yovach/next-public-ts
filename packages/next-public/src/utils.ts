@@ -2,7 +2,10 @@ import type { Options as SwcOptions } from "@swc/core";
 import crypto from "node:crypto";
 import { mkdir, writeFile } from "node:fs/promises";
 import { dirname, join as pathJoin } from "node:path";
-import { HANDLED_GLOB_EXTENSIONS, HANDLED_REGEX_EXTENSIONS } from "./constants.ts";
+import {
+  HANDLED_GLOB_EXTENSIONS,
+  HANDLED_REGEX_EXTENSIONS,
+} from "./constants.ts";
 
 /**
  * Regex pattern for public environment variables
@@ -42,10 +45,24 @@ function getEnvVar(name: string): string {
   return `"${value}"`;
 }
 
-export async function transformFileContent(fileCntent: string): Promise<string> {
+export async function transformFileContent(
+  fileContent: string,
+): Promise<string> {
   const { transform } = await import("@swc/core");
 
-  const transformed = await transform(fileCntent, getSwcOptions());
+  const transformed = await transform(fileContent, {
+    minify: true,
+    jsc: {
+      transform: {
+        treatConstEnumAsEnum: true,
+        verbatimModuleSyntax: true,
+      },
+      parser: {
+        syntax: "typescript",
+      },
+      target: "es2022",
+    },
+  });
   // replace %checksum% with the checksum of the file
   // can be used for service worker versioning
   transformed.code = transformed.code.replace(
