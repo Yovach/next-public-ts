@@ -4,6 +4,7 @@
   "description": "A webpack plugin to compile TypeScript files in the public folder of a Next.js project.",
   "license": "MIT",
   "bugs": "https://github.com/Yovach/next-public-ts/issues",
+  "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "files": [
@@ -14,14 +15,16 @@
   },
   "exports": {
     ".": {
-      "import": "./dist/index.mjs",
-      "require": "./dist/index.js"
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
     }
   },
   "devDependencies": {
-    "tsup": "^8.0.2",
-    "typescript": "^5.2.2",
-    "webpack": "^5.89.0"
+    "@types/node": "18.19.123",
+    "@types/webpack": "5.28.5",
+    "tsup": "8.5.0",
+    "typescript": "5.9.2",
+    "webpack": "5.101.3"
   },
   "repository": {
     "type": "git",
@@ -34,7 +37,11 @@
     "public"
   ],
   "dependencies": {
-    "@swc/core": "^1.3.95",
-    "glob": "^10.3.12"
+    "@swc/core": "1.13.5",
+    "file-loader": "6.2.0",
+    "glob": "10.4.5"
+  },
+  "peerDependencies": {
+    "next": ">=13 <16"
   }
 }
