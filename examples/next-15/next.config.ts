@@ -1,16 +1,30 @@
 import type { NextConfig } from "next";
-import { NextPublicTsPlugin } from "next-public";
-import path from "node:path";
-import type webpack from "webpack";
 
 const nextConfig: NextConfig = {
-  webpack: (config: webpack.Configuration)  => {
-    config.plugins?.push(new NextPublicTsPlugin({
-      inputDir: path.join("src", "app", "+public"),
-      outputDir: path.join("public"),
-    }));
-    return config;
-  }
+  turbopack: {
+    resolveExtensions: ['.mdx', '.tsx', '.ts', '.jsx', '.js', '.mjs', '.json', '.public.ts'],
+    rules: {
+      "*.public.ts": {
+        loaders: ["file-loader", "next-public"],
+        as: "*.js",
+      }
+    },
+
+  },
+  // webpack(config) {
+  //   config.module.rules.push({
+  //     test: /\.pts$/,
+  //     use: [
+  //       {
+  //         loader: "next-public",
+  //         options: {
+  //           as: "*.js"
+  //         }
+  //       }
+  //     ]
+  //   });
+  //   return config;
+  // }
 };
 
 export default nextConfig;

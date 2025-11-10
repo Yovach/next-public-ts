@@ -3,13 +3,13 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev --turbo",
     "build": "next build",
     "start": "next start",
     "test": "npm run build && node --test"
   },
   "dependencies": {
-    "next": "15.5.2",
+    "next": "15.5.6",
     "react": "19.1.0",
     "react-dom": "19.1.0"
   },
