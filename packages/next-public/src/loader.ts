@@ -12,5 +12,14 @@ export async function loader(
 
   this.cacheable?.();
 
-  return await transformFileContent(source);
+  console.log(this.getOptions(), this.rootContext, this)
+
+  console.log('compile config')
+
+  const transformedCode = await transformFileContent(source);
+  const x = `export default {
+  src: "data:application/javascript;base64,${Buffer.from(transformedCode).toString("base64")}",
+}`
+console.log(x);
+return x;
 }
