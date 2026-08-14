@@ -13,7 +13,8 @@ const nextConfig = {
       enabled: !context.isServer && !context.dev,
     }));
     return config;
-  }
+  },
+  turbopack: {},
 };
 
 module.exports = nextConfig;
